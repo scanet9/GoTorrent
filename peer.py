@@ -1,55 +1,63 @@
 import datetime
-from tracker import *
+from Tracker import *
 from pyactor.context import interval
-import random
+from random import choice
+from pyactor.context import set_context, create_host, sleep, shutdown, interval, later, serve_forever
+
+llargada_paraula = 0
 
 class Peer(object):
+    _tell = ['attach', 'announce_peer', 'seed_fitxer', 'init_start', 'donar_lletra', 'push', 'demanar_lletra']
+    _ask = ['pull']
+    _ref = ['attach', 'init_start', 'push']
 
     def __init__(self):
         self.paraula = {}
-        self.torrentHash="file.txt"
+        self.torrent_hash = "peli.txt"
 
-    def init_start(self):
+    def attach(self, tracker, printer):
+        self.tracker = tracker
+        self.printer = printer
+
+    def announce_peer(self):
+        self.tracker.announce(self.torrent_hash, self)
+
+    def seed_fitxer(self):
+        with open(self.torrent_hash) as f:
+            for idx, ch in enumerate(f.readline()):
+                self.paraula[idx] = ch
+        global llargada_paraula
+        llargada_paraula = len(self.paraula)
+
+    def init_start(self, opcio):
         self.interval = interval(self.host, 3, self.proxy, 'announce_peer')
-        later(5, self.proxy, 'stop_interval')
+        if (opcio == 1 or opcio == 3):
+            self.interval1 = interval(self.host, 1, self.proxy, 'demanar_lletra')
+        if (opcio == 2 or opcio == 3):
+            self.interval2 = interval(self.host, 1, self.proxy, 'donar_lletra')
 
-        intervals de temps
-        announce
+    def donar_lletra(self):
+        for peer in self.tracker.get_peers(self.torrent_hash):
+            try:
+                lletra = choice(self.paraula.items())
+                peer.push(lletra[0], lletra[1])
+            except:
+                pass
 
-        self.interval = interval(self.host, 3, self.proxy, 'announce_peer') //cridar annunce tracker
-        if push pull hybrid
-
-    def seedFitxer(self):
-        id=0
-        with open("file.txt") as f:
-            for line in f:
-                for ch in line:
-                    self.paraula[id] = ch
-                    id=id+1
-        self.llargadaParaula = id+1
-
-    def recive_data(self):
-
-    def push(self):
-        llistaPeers = self.tracker.getPeers(self.torrentHash)
-        for peer in llistaPeers:
-            self.paraula.choice()
-            peer.recive_data()
-            enviar posicio i lletra
+    def push(self, pos, lletra):
+        self.paraula[pos] = lletra
+        self.printer.printer(str(self.id)+str(self.paraula))
 
     def demanar_lletra(self):
+        for peer in self.tracker.get_peers(self.torrent_hash):
+            for i in range(llargada_paraula):
+                if (i not in self.paraula.keys()):
+                    try:
+                        self.paraula[i] = peer.pull(i)
+                        self.printer.printer(str(self.id)+str(self.paraula))
+                    except:
+                        pass
+                    break
 
-    def pull(self):
-
-        for i in self.llargadaParaula:
-            if (i not in self.paraula.keys()):
-                demanar lletra
-
-    def hybrid(self):
-
-    def attach(self, tracker):
-        self.tracker=tracker
-
-
-
-
+    def pull(self, i):
+        return self.paraula[i]

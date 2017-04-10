@@ -1,45 +1,36 @@
-import peer
-import tracker
-from pyactor.context import set_context, create_host, sleep, shutdown, serve_forever
+from pyactor.context import set_context, create_host, serve_forever
+from Peer import *
+from Tracker import *
+from Print import *
 
 if __name__ == "__main__":
-
     set_context()
-
     h = create_host()
 
-    t = h.spawn("Tracker", tracker)
+    tracker = h.spawn("tracker", Tracker)
+    printer = h.spawn("printer", Print)
 
-    seed = h.spawn("Seed", peer)
-    josep = h.spawn("Josep", peer)
-    sergi = h.spawn("Sergi", peer)
-    pedro = h.spawn("Pedro", peer)
-    andrea = h.spawn("Andrea", peer)
-    trump = h.spawn("Trump", peer)
+    seed = h.spawn("Seed", Peer)
+    josep = h.spawn("Josep", Peer)
+    sergi = h.spawn("Sergi", Peer)
+    pedro = h.spawn("Pedro", Peer)
+    andrea = h.spawn("Andrea", Peer)
+    trump = h.spawn("Trump", Peer)
 
-    seed.seedFitxer()
+    seed.attach(tracker, printer)
+    josep.attach(tracker, printer)
+    sergi.attach(tracker, printer)
+    pedro.attach(tracker, printer)
+    andrea.attach(tracker, printer)
+    trump.attach(tracker, printer)
 
-    seed.attach_tracker(tracker)
-    josep.attach_tracker(tracker)
-    sergi.attach_tracker(tracker)
-    pedro.attach_tracker(tracker)
-    andrea.attach_tracker(tracker)
-    trump.attach_tracker(tracker)
-
-    tracker.init_start()
-
-    seed.init_start()
-    josep.init_start()
-    sergi.init_start()
-    pedro.init_start()
-    andrea.init_start()
-    trump.init_start()
-
-    josep.calculTime()
-    sergi.calculTime()
-    pedro.calculTime()
-    andrea.calculTime()
-    trump.calculTime()
-    seed.calculTime()
+    seed.seed_fitxer()
+    seed.init_start(3)
+    josep.init_start(3)
+    sergi.init_start(3)
+    pedro.init_start(3)
+    andrea.init_start(3)
+    trump.init_start(3)
 
     serve_forever()
+
