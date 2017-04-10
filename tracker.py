@@ -12,13 +12,13 @@ class Tracker(object):
         self.tracker = {}  # Dicionari [key=hashTorrent, dicionari[idPeer,ttl]]
 
     def init_intervals(self):
-        self.interval = interval(self.host, 1, self.proxy, "calcul_time")   #cada 1s mira calcul_time
+        self.interval = interval(self.host, 1, self.proxy, "calcul_time")   # cada 1s mira calcul_time
 
     def announce(self, torrentHash, idPeer):
         try:
             self.tracker[torrentHash][idPeer] = datetime.now()
         except KeyError:
-            self.tracker[torrentHash] = {idPeer: datetime.now()}    #en cas que sigui el primer announce
+            self.tracker[torrentHash] = {idPeer: datetime.now()}    # en cas que sigui el primer announce
 
     def get_peers(self, torrentHash):
         try:
