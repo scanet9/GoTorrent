@@ -1,6 +1,6 @@
 from pyactor.context import set_context, create_host, serve_forever
-from Peer import *
-from Tracker import *
+from peer import *
+from tracker import *
 from Print import *
 
 if __name__ == "__main__":

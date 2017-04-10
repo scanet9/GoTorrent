@@ -1,8 +1,5 @@
-import datetime
-from Tracker import *
-from pyactor.context import interval
 from random import choice
-from pyactor.context import set_context, create_host, sleep, shutdown, interval, later, serve_forever
+from pyactor.context import interval
 
 llargada_paraula = 0
 
